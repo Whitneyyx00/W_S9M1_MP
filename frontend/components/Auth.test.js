@@ -41,49 +41,85 @@ describe('Auth component', () => {
     // ✨ assert that the input has the value entered (done for you)
     expect(userInput).toHaveValue('gabe')
     // ✨ type some text in the password input
+    await user.type(passInput, 'password123!');
     // ✨ assert that the input has the value entered
-    expect(true).toBe(false) // DELETE
-  })
+    expect(passInput).toHaveValue('password123!');
+  });
   test('[2] Submitting form clicking button shows "Please wait..." message', async () => {
     // ✨ type whatever values on username and password inputs
+    await user.type(userInput, 'Shakira');
+    await user.type(passInput, 'Suerte1977%');
+
     // ✨ click the Login button
+    await user.click(loginBtn);
+
     // ✨ assert that the "Please wait..." message is visible in the DOM
-    expect(true).toBe(false) // DELETE
-  })
+    expect(await screen.findByText('Please wait...')).toBeVisible();
+  });
   test('[3] Submitting form typing [ENTER] shows "Please wait..." message', async () => {
     // ✨ type whatever values in username and password inputs
+    await user.type(userInput, 'Beyonce');
+    await user.type(passInput, 'Halo1981#');
+
     // ✨ hit the [ENTER] key on the keyboard
+    await user.keyboard('{Enter}');
+
     // ✨ assert that the "Please wait..." message is visible in the DOM
-    expect(true).toBe(false) // DELETE
-  })
+    expect(await screen.findByText('Please wait...')).toBeVisible();
+  });
   test('[4] Submitting an empty form shows "Invalid Credentials" message', async () => {
     // ✨ submit an empty form
+    await user.click(loginBtn);
+
     // ✨ assert that the "Invalid Credentials" message eventually is visible
-    expect(true).toBe(false) // DELETE
-  })
+    expect(await screen.findByText('Invalid Credentials')).toBeVisible();
+  });
   test('[5] Submitting incorrect credentials shows "Invalid Credentials" message', async () => {
     // ✨ type whatever username and password and submit form
+    await user.type(userInput, 'wrongUser');
+    await user.type(passInput, 'wrongPassword');
+    await user.click(loginBtn);
+
     // ✨ assert that the "Invalid Credentials" message eventually is visible
-    expect(true).toBe(false) // DELETE
-  })
+    expect(await screen.findByText('Invalid Credentials')).toBeVisible();
+  });
   for (const usr of registeredUsers) {
     test(`[6.${usr.id}] Logging in ${usr.username} makes the following elements render:
         - correct welcome message
         - correct user info (ID, username, birth date)
         - logout button`, async () => {
       // ✨ type valid credentials and submit form
+      await user.type(userInput, usr.username);
+      await user.type(passInput, usr.password);
+      await user.click(loginBtn);
+
       // ✨ assert that the correct welcome message is eventually visible
+      expect(await screen.findByText(`Welcome back, ${usr.username}. We LOVE you!`)).toBeVisible();
+
       // ✨ assert that the correct user info appears is eventually visible
+      expect(await screen.findByText(`ID: ${usr.id}, Username: ${usr.username}, Born: ${usr.born}`)).toBeVisible();
+
       // ✨ assert that the logout button appears
-      expect(true).toBe(false) // DELETE
-    })
+      expect(await screen.findByTestId('logoutBtn')).toBeVisible();
+    });
   }
   test('[7] Logging out a logged-in user displays goodbye message and renders form', async () => {
     // ✨ type valid credentials and submit
+    await user.type(userInput, 'Shakira');
+    await user.type(passInput, 'Suerte1977%');
+    await user.click(loginBtn);
+
     // ✨ await the welcome message
+    await screen.findByText('Welcome back, Shakira. We LOVE you!');
+
     // ✨ click on the logout button (grab it by its test id)
+    const logoutBtn = await screen.findByTestId('logoutBtn');
+    await user.click(logoutBtn);
+
     // ✨ assert that the goodbye message is eventually visible in the DOM
+    expect(await screen.findByText('Goodbye!')).toBeVisible();
+
     // ✨ assert that the form is visible in the DOM (select it by its test id)
-    expect(true).toBe(false) // DELETE
-  })
+    expect(screen.getByTestId('login-form')).toBeVisible();
+  });
 })
